@@ -1,0 +1,186 @@
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+
+<?php /** @var  $block Magenest\OrderManager\Block\Order\ViewManage */ ?>
+<?php
+$symbol     = $block->getSymbolItem();
+$_dataOrder = $block->getItemsInfo();
+$_billing   = $block->getBillingAddress();
+$_shipping   = $block->getShippingAddress();
+$order_id   = $block->getOrderId();
+$_total = $block->getTotal();
+$symbol = $_total['symbol'];
+$discount = $_total['discount'];
+$subtotal = $_total['subtotal'];
+$shipping = $_total['shipping_handling'];
+$tax = $_total['tax'];
+$grandtotal = $_total['grandtotal'];
+?>
+<?php if($_dataOrder->getData()): ?>
+<div class="table-wrapper collection-products" id="product_order">
+    <table id="my-collection-products-table" class="data table table-collection-products">
+        <div>
+            <font color="red">Items Order</font> </br>
+        </div>
+        <thead>
+        <tr class="headings">
+            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Product') ?></span></th>
+            <th class="col-price"><span><?php /* @escapeNotVerified */ echo __('Price') ?></span></th>
+            <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+            <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
+            <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+            <th class="col-tax"><span><?php /* @escapeNotVerified */ echo __('Tax') ?></span></th>
+            <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
+        </tr
+        </thead>
+        <tbody>
+        <?php $i = 0 ?>
+        <?php foreach ($_dataOrder as $_data ) { ?>
+            <?php $itemId= $_data->getId();
+            $productId = $_data->getProductId();
+            ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
+                    <?php echo  $_data->getName(); ?>
+                    <div class="product-sku-block">
+                        <span><?php /* @escapeNotVerified */ echo __('SKU') ?>:</span>
+                        <?php echo $_data->getSku()?>
+                    </div>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col-price">
+                    <?php echo $symbol.(float)$_data->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
+                    <?php echo $_data->getQuantity(); ?>
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
+                    <?php echo $_data->getDiscount(); ?>%
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col-tax">
+                    <?php echo (float)$_data->getTax().'%'; ?>
+
+                </td>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()
+                            * (1-($_data->getTax() + $_data->getDiscount())/100)); ?>
+
+                </td>
+            </tr>
+        <?php } ?>
+        </tbody>
+        <tfoot  >
+        <tr class="discount" >
+            <th >Discount</th>
+            <td class="amount" data-th="discount">
+                <span class="price"><?php echo  $symbol.$discount; ?></span>
+            </td>
+        </tr>
+        <tr class="subtotal">
+            <th>Subtotal</th>
+            <td class="amount" data-th="Subtotal">
+                <span class="price"><?php echo  $symbol.$subtotal; ?></span>
+            </td>
+        </tr>
+        <tr class="shippinghandling">
+            <th>Shipping & Handling</th>
+            <td class="amount" data-th="shippinghandling">
+                <span class="price"><?php echo  $symbol.$shipping; ?></span>
+            </td>
+        </tr>
+        <tr class="tax">
+            <th>Tax</th>
+            <td class="amount" data-th="Tax">
+                <span class="price"><?php echo  $symbol.$tax; ?></span>
+            </td>
+        </tr>
+        <tr class="grandtotal">
+            <th>Grand Total</th>
+            <td class="amount" data-th="Grand Total">
+                <span class="price"><?php echo  $symbol.$grandtotal; ?></span>
+            </td>
+        </tr>
+
+        </tfoot>
+    </table>
+</div>
+<?php else: ?>
+<?php endif;?>
+</br>
+</br>
+
+
+<?php if (!empty($_billing) || !empty($_shipping)):?>
+<table class="data-table" data-role="flex-table">
+    <div>
+        <font color="red">Address Information </font> </br>
+    </div>
+    <thead>
+    <tr class="headings">
+        <th class="col-billing">
+            <span><?php /* @escapeNotVerified */ echo __('Billing Address') ?></span>
+        </th>
+        <th class="col-shipping">
+            <span><?php /* @escapeNotVerified */ echo __('Shipping Address') ?></span>
+        </th>
+    </tr
+    </thead>
+    <tbody>
+    <tr>
+        <td data-th="<?php echo $block->escapeHtml(__('Billing Address')) ?>" class="col-billing">
+            <?php if(!empty($_billing)):?>
+
+                <?php echo  $_billing['name']; ?>
+                </br>
+                <?php echo  $_billing['company']; ?>
+                </br>
+                <?php echo  $_billing['street']; ?>
+                </br>
+                <?php echo  $_billing['region_info']; ?>
+                </br>
+                <?php echo  $_billing['country']; ?>
+                </br>
+                <?php echo  'T: '.$_billing['telephone']; ?>
+
+                <?php else :?>
+                <?php echo 'No Change' ?>
+                <?php endif;?>
+
+        </td>
+        <td data-th="<?php echo $block->escapeHtml(__('Shipping Address')) ?>" class="col-shipping">
+            <?php if(!empty($_shipping)):?>
+
+                 <?php echo $_shipping['name']; ?>
+                </br>
+                <?php echo  $_shipping['company']; ?>
+                </br>
+                <?php echo  $_shipping['street']; ?>
+                </br>
+                <?php echo  $_shipping['region_info']; ?>
+                </br>
+                <?php echo  $_shipping['country']; ?>
+                </br>
+                <?php echo  'T: '.$_shipping['telephone']; ?>
+
+                 <?php else :?>
+                <?php echo 'No Change' ?>
+                <?php endif;?>
+        </td>
+
+    </tr>
+    </tbody>
+</table>
+<?php elseif(empty($_billing) && empty($_shipping)):?>
+<?php endif; ?>

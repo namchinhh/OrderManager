@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="ordermanager_send_email_after_click_button_accept">
+        <observer name="event_accept_ordermanager" instance="Magenest\OrderManager\Observer\Backend\EventAcceptObserver"/>
+    </event>
+    <event name="ordermanager_send_email_after_click_button_delete">
+        <observer name="event_delete_ordermanager" instance="Magenest\OrderManager\Observer\Backend\EventDeleteObserver"/>
+    </event>
+</config>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add
+                id="Magenest_OrderManager::ordermanager"
+                title="Manage Order"
+                module="Magenest_OrderManager"
+                sortOrder="60"
+                parent="Magento_Sales::sales"
+                resource="Magenest_OrderManager::ordermanager"
+        />
+        <add
+                id="Magenest_OrderManager::order"
+                title="Order manage "
+                module="Magenest_OrderManager"
+                sortOrder="70"
+                parent="Magenest_OrderManager::ordermanager"
+                action="ordermanager/order/"
+                resource="Magenest_OrderManager::order"
+        />
+    </menu>
+</config>

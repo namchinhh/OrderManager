@@ -1,0 +1,109 @@
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+<?php /** @var  $block Magenest\OrderManager\Block\Product\NewProduct */ ?>
+<?php
+$_dataOrder = $block->getNewProduct();
+$symbol = $block->getSymbolCurrency();
+?>
+<?php /** Table new product */ ?>
+<div>
+    <font color="red" style="font-size:150%;">New List Products</font> </br>
+</div>
+<button id="cancel_content" style="float: left" class="cancel"
+       onclick="window.location.href='<?php echo $block->getCancelUrl() ?>'" >Cancel</button>
+<form class="form-product-new"  method="post" id="form-validate" enctype="multipart/form-data"
+      action="<?php echo $block->getUpdateQuantityUrl();?>"
+      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+    <div class="actions-toolbar" style="float: right">
+
+            <button type="submit" class="update primary" data-action="update-Data"
+                    title="<?php /* @escapeNotVerified */ echo __('Update Data') ?> "
+                   value="Update Item(s)"
+            >
+                Update Item(s)
+    </button>
+    </div>
+    <div>
+        <input name="form_key" value="<?php echo $block->getFormKey() ?>" type="hidden">
+    </div>
+    <table id="my-collection-products-table-new" class="data table table-collection-products-new" >
+        <caption class="table-caption"><?php echo __('List Product') ?></caption>
+
+        <thead>
+        <tr class="headings">
+            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Product') ?></span></th>
+            <th class="col-price"><span><?php /* @escapeNotVerified */ echo __('Price') ?></span></th>
+            <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+            <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
+            <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+            <th class="col-tax"><span><?php /* @escapeNotVerified */ echo __('Tax') ?></span></th>
+            <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
+            <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+        </tr
+        </thead>
+        <tbody>
+        <?php $i = 0 ?>
+        <?php foreach ($_dataOrder as $_data ) { ?>
+            <?php $productId = $_data->getProductId();
+                    $id = $_data->getId();
+            ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
+                    <?php echo  $_data->getName(); ?>
+                    <div class="product-sku-block">
+                        <span><?php /* @escapeNotVerified */ echo __('SKU') ?>:</span>
+                        <?php echo $_data->getSku()?>
+                    </div>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col-price">
+                    <?php echo $symbol.(float)$_data->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
+                    <div class="control">
+                        <?php if($block->getStockProduct()->getStockQty($productId) > 0): ?>
+                            <?php $max = $block->getStockProduct()->getStockQty($productId); ?>
+                        <?php else :?>
+                            <?php $max = $_data->getQuantity(); ?>
+                        <?php endif;?>
+                        <input type="number" name="quantity-<?php echo $productId  ?>" id="quantity" class="input-number-quantity"
+                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>" min="<?php echo $_data->getQuantity(); ?>"
+                        max="<?php echo $block->getStockProduct()->getStockQty($productId); ?>">
+                    </div>
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
+                    <?php echo $_data->getDiscount().'%'; ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col-tax">
+                    <?php echo (float)$_data->getTax().'%'; ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()
+                        *( 1 - ($_data->getDiscount() *$_data->getTax())/100 )); ?>
+
+                </td>
+                <?php if($_data->getType()): ?>
+                <td class="col-actions last">
+                    <a href="<?php echo $block->getRemoveProduct($id) ?>" class="action view">
+                        <span><?php /* @escapeNotVerified */ echo __('Remove') ?></span>
+                    </a>
+                </td>
+                <?php endif; ?>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+</form>

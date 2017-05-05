@@ -1,0 +1,152 @@
+
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+
+<?php /** @var  $block Magenest\OrderManager\Block\Product\View */ ?>
+<?php
+$_items = $block->getItems();
+$orderId = $_items->getId();
+$collections = $block->getDataProduct();
+$symbol = $_items->getOrderCurrency()->getCurrencySymbol();
+$_dataOrder = $block->getNewProduct();
+$imageRender = $block->getImageRender();
+?>
+
+<input type="button" id="addproduct_content" style="float: right" class="action primary add"
+        onclick="window.location.href='<?php echo $block->getAddProductUrl() ?>'" value="Add Products"/>
+
+<div class="table-wrapper collection-products" id="product_order">
+    <form class="form-address-edit"  method="post" id="form-validate" enctype="multipart/form-data"
+          action="<?php echo $block->getUpdateProductUrl()?>"
+          data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>" style="display: block" >
+        <div class="actions-toolbar" >
+<!--            <div class="primary">-->
+<!--                <input type="submit" class="action primary update continue" id="update_data_continue" data-action="update-Data"-->
+<!--                        title="--><?php ///* @escapeNotVerified */ echo __('Update Data') ?><!--"-->
+<!--                        value="Update and Continue"-->
+<!--                />-->
+<!--            </div>-->
+            <div class="secondary">
+                <input type="submit" class="action primary update" id="update_data_continue"
+                        formaction="<?php echo $block->getUpdateBackUrl() ?>"
+                        title="<?php /* @escapeNotVerified */ echo __('Update Back') ?>"
+                       value="Update"
+                />
+            </div>
+        </div>
+        <?php /** Table old product */ ?>
+        <table id="my-collection-products-table" class="data table table-collection-products" >
+            <caption class="table-caption"><?php echo __('List Product') ?></caption>
+            <thead>
+            <tr class="headings">
+                <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Product') ?></span></th>
+                <th class="col-price"><span><?php /* @escapeNotVerified */ echo __('Price') ?></span></th>
+                <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+                <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
+                <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+                <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
+            </tr
+            </thead>
+            <tbody>
+            <?php $i = 0 ?>
+
+            <?php foreach ($_items->getAllItems()as $_item ) { ?>
+                <?php $productId = $_item->getProductId();
+                ?>
+                <tr>
+                    <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
+                        <?php echo  $_item->getName(); ?>
+                        <div class="product-sku-block">
+                            <span><?php /* @escapeNotVerified */ echo __('SKU') ?>:</span>
+                            <?php echo $_item->getSku()?>
+                        </div>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col-price">
+                        <?php echo $symbol.(float)$_item->getPrice(); ?>
+
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
+                        <div class="control">
+                            <?php if($block->getStockProduct()->getStockQty($productId) > 0): ?>
+                                <?php $max = $block->getStockProduct()->getStockQty($productId); ?>
+                            <?php else :?>
+                                <?php $max = $_item->getQtyOrdered(); ?>
+                            <?php endif;?>
+                            <input type="number" name="quantity-<?php echo $productId ?>" id="quantity" class="input-number-quantity"
+                                   style="width: 50px;" value="<?php echo $_item->getQtyOrdered(); ?>" min="<?php echo $_item->getQtyOrdered(); ?>"
+                            max="<?php echo $max ?>">
+                        </div>
+
+                    </td>
+
+                    <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
+                        <?php echo $symbol.($_item->getPrice()) * ($_item->getQtyOrdered()); ?>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
+                        <?php echo $symbol.(float)$_item->getDiscountAmount(); ?>
+                    </td>
+                    <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
+                        <?php echo $symbol.(float)$_item->getRowTotal(); ?>
+                    </td>
+                </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+
+    </form>
+    <?php if(!empty($_dataOrder->getData())): ?>
+    <?php /** Table new product */ ?>
+    <div id="new_product">
+    <?php echo $block->getProductNew();?>
+    <?php /** total order */ ?>
+    <?php if(!empty($_dataOrder->getData())):?>
+    <div class="table-wrapper collection-total" id="total_info" >
+        <?php echo $block->getSubtotal(); ?>
+    </div>
+    <?php endif;?>
+    </div>
+    <?php endif;?>
+</div>
+
+<?php if ($block->getPagerHtml()): ?>
+    <div class="products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+<?php endif ?>
+
+<?php /** Table add new product */ ?>
+<script type="text/javascript">
+    require([
+        'jquery',
+        "underscore",
+        'Magento_Ui/js/form/form',
+        'ko',
+        'Magento_Ui/js/modal/modal'
+    ], function($) {
+        'use strict';
+        $("#show_content").click(function(){
+            $("#addProduct").show();
+            $("#product_order").hide();
+            $("#show_content").hide();
+            $("#total").hide();
+        });
+        $("#hide_content").click(function(){
+            $("#addProduct").hide();
+            $("#product_order").show();
+            $("#show_content").show();
+            $("#total").show();
+        });
+//        $("#update_data_continue").click(function(){
+//            var element=document.getElementById("form-validate");
+//            element.style.display="none";
+//        });
+    });
+
+</script>
+
+
+

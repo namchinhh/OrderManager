@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <!--<referenceBlock name="order_tab_info">-->
+        <!--<arguments>-->
+            <!--<argument name="template" xsi:type="string">Magenest_OrderManager::order/info.phtml</argument>-->
+        <!--</arguments>-->
+    <!--</referenceBlock>-->
+    <referenceBlock name="order_items">
+        <arguments >
+            <argument name="template" xsi:type="string">Magenest_OrderManager::order/view/items.phtml</argument>
+        </arguments>
+    </referenceBlock>
+
+
+</layout>

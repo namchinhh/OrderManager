@@ -1,0 +1,156 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: root
+ * Date: 17/05/2016
+ * Time: 14:26
+ */
+?>
+<?php
+/*
+
+* @var $block \Magenest\OrderManager\Block\Product\AddProduct
+*/
+?>
+<?php
+$collections = $block->getCollection();
+$imageRender = $block->getImageRender();
+$currency = $block->getSymbolCurrency();
+?>
+
+<form class="form-product-new"  method="post" id="form-validate" enctype="multipart/form-data"
+      action="<?php echo $block->getSearchUrl();?>"
+      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+
+    <input type="text" name="name" id="quantity" class="input-number-quantity" style="width: 300px;float: right" placeholder="Search by name...">
+    <div>
+        <input name="form_key" value="<?php echo $block->getFormKey() ?>" type="hidden">
+    </div>
+    </br>
+</form>
+</br>
+</br>
+
+<div id="addProduct" >
+    <?php if ($collections && count($collections)): ?>
+        <div class="products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); // for display pager block which we create in block file.   ?></div>
+        <table id="sampleTbl" class="data table table-collection-products">
+        <caption class="table-caption"><?php echo __('List Product') ?></caption>
+        <thead>
+        <tr>
+            <th><?php echo __('Id') ?></th>
+            <th><?php echo __('Thumbnail') ?></th>
+            <th><?php echo __('Product') ?></th>
+            <th><?php echo __('SKU') ?></th>
+            <th><?php echo __('Price (').$currency.(')')?></th>
+            <th><?php echo __('Discount (%)') ?></th>
+            <th><?php echo __('Tax(%)') ?></th>
+            <th><?php echo __('Select') ?></th>
+            <th><?php echo __('Quantity') ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($collections as $collection ) {
+            ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Id')) ?>" class="col id" name="productId_item"
+                    id="productId_item">
+                    <?php echo  $collection->getId(); ?>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Thumbnail')) ?>" class="col id" name="thumbnail_item"
+                    id="thumbnail_item">
+                    <!--                    --><?php //echo '<img src="http://127.0.0.1/magento/pub/media/catalog/product/'.$collection->getThumbnail().'" width="40" height="40" />';?>
+                    <?php
+                    $imageUrl = $imageRender.'catalog/product/'.$collection->getThumbnail();
+                    echo '<img src="'.$imageUrl.'" width="40"/>' ?>
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col product" name="name_item"
+                    id="name_item">
+                    <?php echo $collection->getName(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('SKU')) ?>" class="col sku" name="sku_item"
+                    id="sku_item">
+                    <?php echo $collection->getSku(); ?>
+
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col price" name="price_item"
+                    id="price_item">
+                    <?php echo (float)$collection->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col discount" name="discount_item"
+                    id="discount_item">
+                    <?php echo (float)$collection->getDiscount(); ?>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col tax" name="tax_item"
+                    id="tax_item">
+                    <?php echo (float)$collection->getTaxPercent(); ?>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Select')) ?>" class="col select" >
+                    <input type="checkbox" name="select_product" id="select_product" style="width: 30px;height: 30px "/>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Quantity')) ?>" class="col quantity" name="quantity_item"
+                    id="quantity_item">
+                    <div class="control"  >
+                        <input type="number" name="quantity" id="quantity_check" class="input-number-quantity"
+                               style="width: 50px;" min="1" max="<?php echo  $block->getStockProduct()->getStockQty( $collection->getId()); ?>">
+                    </div>
+
+                </td>
+            </tr>
+
+        <?php } ?>
+        </tbody>
+    </table>
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); // for display pager block which we create in block file.   ?></div>
+        <?php endif ?>
+    <?php else: ?>
+        <div class="message info empty"><span><?php echo __('empty'); ?></span></div>
+    <?php endif ?>
+    <button id="addproduct_content" style="float: left" class="action primary back"
+            onclick="window.location.href='<?php echo $block->getBackUrl() ?>'">Back</button>
+    <button id="save_content" style="float: right" class="action primary data">Add Selected Product(s) to Order</button>
+</div>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        "underscore",
+        'Magento_Ui/js/form/form',
+        'ko',
+        'Magento_Ui/js/modal/modal'
+    ], function($) {
+        'use strict';
+        $("#save_content").click(function(){
+            var TableDatas;
+            var TableData = new Array();
+            $('#sampleTbl tr').has('input[type="checkbox"]:checked').each(function (row, tr) {
+                TableData[row] = {
+                    "productId": $(tr).find('td:eq(0)').text()
+                    , "orderId": $(tr).find('td:eq(1)').text()
+                    , "name": $(tr).find('td:eq(2)').text()
+                    , "sku": $(tr).find('td:eq(3)').text()
+                    , "price": $(tr).find('td:eq(4)').text()
+                    , "discount": $(tr).find('td:eq(5)').text()
+                    , "tax": $(tr).find('td:eq(6)').text()
+                    , "quantity": $(tr).find('td:eq(8) input').val()
+                }
+            });
+            TableDatas = JSON.stringify(TableData);
+//                $('#tbTableValues').val('JSON array: \n' + TableDatas.replace(/},/g, "},\n"));
+            $.ajax({
+                type: "POST",
+                url: '<?php echo $block->getNewAddProductUrl(); ?>',
+                data: "pTableData=" + TableDatas,
+                success: function(json){
+//                    if(!json.error) location.reload(true);
+                }
+            });
+        });
+    });
+
+</script>

@@ -1,0 +1,52 @@
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+<?php
+
+$_data = $block->getTotalInfo();
+$symbol = $_data['symbol'];
+$discount = $_data['discount'];
+$subtotal = $_data['subtotal'];
+$shipping = $_data['shipping_handling'];
+$tax = $_data['tax'];
+$grandtotal = $_data['grandtotal'];
+?>
+<table style="width:30%" align="right">
+<tfoot>
+<tr class="discount" >
+    <th >Giảm giá</th>
+    <td class="amount" data-th="discount">
+        <span class="price"><?php echo  $symbol.$discount; ?></span>
+    </td>
+</tr>
+<tr class="subtotal">
+    <th>Tổng giá sản phẩm</th>
+    <td class="amount" data-th="Subtotal">
+        <span class="price"><?php echo  $symbol.$subtotal; ?></span>
+    </td>
+</tr>
+<tr class="shippinghandling">
+    <th>Phí vận chuyển</th>
+    <td class="amount" data-th="shippinghandling">
+        <span class="price"><?php echo  $symbol.(float)$shipping; ?></span>
+    </td>
+</tr>
+<tr class="tax">
+    <th>Thuế</th>
+    <td class="amount" data-th="Tax">
+        <span class="price"><?php echo  $symbol.$tax; ?></span>
+    </td>
+</tr>
+<tr class="grandtotal">
+    <th>Tổng tiền hóa đơn</th>
+    <td class="amount" data-th="Grand Total">
+        <span class="price"><?php echo  $symbol.$grandtotal; ?></span>
+    </td>
+</tr>
+</tfoot>
+</table>

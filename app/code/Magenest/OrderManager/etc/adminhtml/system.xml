@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<config	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magenest" translate="label" sortOrder="200">
+            <label>Magenest</label>
+        </tab>
+        <section id="ordermanager_labels" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1"	showInStore="1">
+        <label>Order Manager</label>
+        <tab>magenest</tab>
+        <resource>Magenest_OrderManager::config_ordermanager</resource>
+        <group id="ordermanager_editor" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Manage Editor</label>
+            <field	id="ordermanager_remove"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                <label>Enable (Remove items Order by Admin)</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            </field>
+            <field	id="ordermanager_delete_core"	translate="label" type="select"  sortOrder="20" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                <label>Allow delete Order by Admin</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            </field>
+            <field	id="ordermanager_edit_item"	translate="label" type="select"  sortOrder="30" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                <label>Allow edit item by Admin on Sales</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            </field>
+        </group>
+        <group id="ordermanager_customer" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Manage Customer</label>
+                <field	id="ordermanager_enable_item" translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                    <label>Disable edit Item(s)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field	id="ordermanager_enable_shipping" translate="label" type="select"  sortOrder="20" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                    <label>Disable edit Shipping Address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field	id="ordermanager_enable_billing" translate="label" type="select"  sortOrder="30" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                    <label>Disable edit Billing Address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+        </group>
+        </section>
+    </system>
+</config>

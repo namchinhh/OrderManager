@@ -1,0 +1,147 @@
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+
+<?php /** @var  $block Magenest\OrderManager\Block\Adminhtml\Order\Edit\Tab\Main */ ?>
+<?php
+$_dataOrder = $block->getItems();
+$order_id   = $block->getOrderId();
+$_total     = $block->getTotal();
+$symbol     = $_total['symbol'];
+?>
+<div class="addproduct">
+    <input type="button" id="addproduct_content" style="float: right" class="action-secondary action-add"
+            onclick="window.location.href='<?php echo $block->getAddProductUrl() ?>'" value="Add Products"/>
+</div>
+
+<form class="form-product-edit"  method="post" id="form-validate" enctype="multipart/form-data"
+      action="<?php echo $block->getUpdateProductUrl();?>"
+      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+      <?php if(!empty($_dataOrder->getData())): ?>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="submit" class="action update primary" data-action="update-Data"
+                    title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>">
+                <span><?php /* @escapeNotVerified */ echo __('Update Items ') ?></span>
+            </button>
+        </div>
+    </div>
+    <?php endif; ?>
+    <div>
+        <input name="form_key" value="<?php echo $block->getFormKey() ?>" type="hidden">
+    </div>
+    <table class="data-table" data-role="flex-table">
+        <thead>
+        <tr class="headings">
+            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Product') ?></span></th>
+            <th class="col-price"><span><?php /* @escapeNotVerified */ echo __('Price') ?></span></th>
+            <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+            <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
+            <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+            <th class="col-tax"><span><?php /* @escapeNotVerified */ echo __('Tax') ?></span></th>
+            <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
+        </tr
+        </thead>
+        <tbody>
+        <?php if(!empty($_dataOrder->getData())): ?>
+        <?php $i = 0 ?>
+        <?php foreach ($_dataOrder as $_data ) { ?>
+            <?php $itemId= $_data->getId();
+            $productId = $_data->getProductId();
+            ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
+                    <?php echo  $_data->getName(); ?>
+                    <div class="product-sku-block">
+                        <span><?php /* @escapeNotVerified */ echo __('SKU') ?>:</span>
+                        <?php echo $_data->getSku()?>
+                    </div>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col-price">
+                    <?php echo $symbol.(float)$_data->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
+                    <div class="control">
+                        <input type="text" name="quantity-<?php echo $productId  ?>" id="quantity" class="input-number-quantity"
+                               style="width: 50px;" value="<?php echo (float)$_data->getQuantity(); ?>">
+                    </div>
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
+                    <div class="control">
+                        <input type="text" name="discount-<?php echo $productId  ?>" id="discount" class="input-percent-discount"
+                               style="width: 50px;" value="<?php echo $_data->getDiscount(); ?>">%
+                    </div>
+                <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col-tax">
+                    <?php echo (float)$_data->getTax().'%'; ?>
+
+                </td>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()
+                        * (1-($_data->getTax() + $_data->getDiscount())/100)); ?>
+
+                </td>
+            <?php if($block->getEnableRemove()==1):?>
+                <td class="col-actions last">
+                    <a href="<?php echo $block->getRemoveProduct($itemId) ?>" class="action view">
+                        <span><?php /* @escapeNotVerified */ echo __('Remove') ?></span>
+                    </a>
+                </td>
+            <?php endif;?>
+            </tr>
+        <?php } ?>
+        <?php endif;?>
+        </tbody>
+    </table>
+</form>
+</br>
+</br>
+<?php if($_dataOrder->getData()): ?>
+    <table style="width:30%" align="right" class="data-table admin__table-secondary order-subtotal-table">
+
+        <tr>
+            <td>
+                <h1 style="font-size:150%;">Order Totals</h1>
+            </td>
+        </tr>
+        <tr>
+            <td>Discount</td>
+            <td><?php echo $symbol.$_total['discount']; ?></td>
+        </tr>
+        <tr>
+            <td>Subtotal</td>
+            <td><?php echo $symbol.$_total['subtotal']; ?></td>
+        </tr>
+        <tr>
+            <td>Shipping & Handling</td>
+            <td> <?php echo  $symbol.(float)$_total['shipping_handling']; ?></td>
+        </tr>
+        <tr>
+            <td>Tax</td>
+            <td> <?php echo  $symbol.$_total['tax']; ?></td>
+        </tr>
+
+        <tr>
+            <td >
+                <h1 style="font-size:120%;">Grand Totals</h1>
+
+            </td>
+            <td>
+                <h1 style="font-size:120%;"><?php echo  $symbol.$_total['grandtotal']; ?></h1>
+
+            </td>
+        </tr>
+    </table>
+
+<?php endif;?>

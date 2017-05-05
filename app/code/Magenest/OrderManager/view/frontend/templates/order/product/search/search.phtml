@@ -1,0 +1,53 @@
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+<?php
+$url = $block->getSearchUrl();
+?>
+<div class="admin__field-control control">
+
+    <label for="ordermanager_rule">
+        <?php echo __('Search box') ?>
+    </label>
+    <input id="ordermanager_rule" name="ordermanager_rule" type="text" value="<?php  echo $this->getName()  ?>">
+    <input id="ordermanager_rule_id" name="ordermanager_rule_id" type="hidden" value="<?php  echo $this->getId() ?>">
+</div>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        "underscore",
+        'Magento_Ui/js/form/form',
+        'ko',
+        'Magento_Ui/js/modal/modal'
+    ], function($) {
+        'use strict';
+        jQuery("#ordermanager_rule").autocomplete({
+            source:function( request, response ) {
+                jQuery.ajax({
+                    url: '<?php echo  $url ?>',
+
+                    data: {
+                        q: request.term
+                    },
+                    success: function( data ) {
+
+                        response(data );
+                    }
+                });
+            },
+            minLength: 3,
+            select: function(event, ui) {
+                console.log(ui.item);
+                jQuery('#ordermanager_rule_id').val(ui.item.id);
+
+            }
+        });
+    });
+
+</script>
