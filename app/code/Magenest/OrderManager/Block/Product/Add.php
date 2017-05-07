@@ -219,6 +219,7 @@ class Add extends Template
     /**
      * @return string
      */
+
     public function getBackUrl()
     {
         $orderId = $this->getOrderId();

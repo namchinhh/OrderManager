@@ -37,7 +37,7 @@ class UpdateItem extends AbstractProduct
                 /** @var \Magenest\OrderManager\Model\OrderItem $collections */
                 foreach ($collection as $collections) {
                     $dataInfo = [
-                        'quantity'     => $data['quantity-'.$collections->getProductId()],
+                        'quantity' => (int)$data['quantity-'.$collections->getProductId()],
                     ];
 
                 /** @var \Magenest\OrderManager\Model\OrderItem $modelSave */

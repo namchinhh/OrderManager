@@ -88,10 +88,10 @@ class Update extends \Magento\Framework\App\Action\Action
         $data = $this->getRequest()->getParams();
         $orderId = $this->getRequest()->getParam('order_id');
         $time = $this->_time->gmtDate();
-
         $customerId = $this->_customerSession->getCustomerId();
         $orderCollection = $this->_orderFactory->create()->load($orderId);
         $status = $orderCollection->getStatus();
+        $store_id = $orderCollection->getStoreId();
         $firstName  = $orderCollection->getCustomerFirstname();
         $lastName   = $orderCollection->getCustomerLastname();
         $email = $orderCollection->getCustomerEmail();
@@ -108,6 +108,7 @@ class Update extends \Magento\Framework\App\Action\Action
             $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage');
             $model->load($id,'order_id');
             $dataInfo = [
+                'store_id'=>$store_id,
                 'order_id' => $id,
                 'customer_id' =>$customerId,
                 'status' => $status,
@@ -139,7 +140,8 @@ class Update extends \Magento\Framework\App\Action\Action
                         'price' =>$item->getPrice() ,
                         'discount'=>'0',
                         'tax'    =>$item->getTaxPercent(),
-                        'quantity' =>$data['quantity-'.$item->getProductId()] ,
+                        'quantity' =>(int)$data['quantity-'.$item->getProductId()] ,
+
                     ];
 
                     /** @var \Magenest\OrderManager\Model\OrderItem $modelItem */

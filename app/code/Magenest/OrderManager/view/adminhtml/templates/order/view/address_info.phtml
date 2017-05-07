@@ -18,7 +18,7 @@ $order_id   = $block->getOrderId();
         <tr class="headings">
             <th class="col-billing">
                 <span><?php /* @escapeNotVerified */ echo __('Billing Address') ?></span>
-                <?php if(!empty($_billing)):?>
+                <?php if(!empty($_billing) && $block->getAccept() == 0):?>
                     <a href="<?php /* @escapeNotVerified */ echo $block->getCustomBillingUrl($order_id) ?>" class="action view">
                         <span><?php /* @escapeNotVerified */ echo __('Edit') ?></span>
                     </a>
@@ -26,7 +26,7 @@ $order_id   = $block->getOrderId();
             </th>
             <th class="col-shipping">
                 <span><?php /* @escapeNotVerified */ echo __('Shipping Address') ?></span>
-                <?php if(!empty($_shipping)):?>
+                <?php if(!empty($_shipping) && $block->getAccept() == 0):?>
                     <a href="<?php /* @escapeNotVerified */ echo $block->getCustomShippingUrl($order_id) ?>" class="action view">
                         <span><?php /* @escapeNotVerified */ echo __('Edit') ?></span>
                     </a>

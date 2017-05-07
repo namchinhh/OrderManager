@@ -90,34 +90,29 @@ class EventDeleteObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $id = $this->_coreRegistry->registry('id');
-        $collection = $this->_manageFactory->create()->load($id);
-        try {
-            $customer_name = $collection->getCustomerName();
-            $customer_email = $collection->getCustomerEmail();
-            $transport = $this->_transportBuilder->setTemplateIdentifier('ordermanager_email_delete_template')->setTemplateOptions(
-                [
-                    'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
-                    'store' => $this->_storeManager->getStore()->getId(),
-                ]
-            )->setTemplateVars(
-                [
-                    'orderId' => $id,
-                    'accept_time'=> time(),
-                ]
-            )->setFrom(
-                [
-                    'email' => $this->_scopeConfig->getValue(self::XML_PATH_EMAIL_SENDER),
-                    'name'  => $this->_scopeConfig->getValue(self::XML_PATH_NAME_SENDER),
-                ]
-            )->addTo(
-                $customer_email,
-                $customer_name
-            )->getTransport();
-            $transport->sendMessage();
-            $this->inlineTranslation->resume();
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-            $this->_logger->critical($e);
-        }
+        $customer_name = $observer->getCustomerName();
+        $customer_email = $observer->getCustomerEmail();
+        $transport = $this->_transportBuilder->setTemplateIdentifier('ordermanager_email_delete_template'
+        )->setTemplateOptions(
+            [
+                'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
+                'store' => $this->_storeManager->getStore()->getId(),
+            ]
+        )->setTemplateVars(
+            [
+                'orderId' => $observer->getOrderId()
+            ]
+        )->setFrom(
+            [
+                'email' => $this->_scopeConfig->getValue(self::XML_PATH_EMAIL_SENDER),
+                'name' => $this->_scopeConfig->getValue(self::XML_PATH_NAME_SENDER),
+            ]
+        )->addTo(
+            $customer_email,
+            $customer_name
+        )->getTransport();
+
+        $transport->sendMessage();
+        $this->inlineTranslation->resume();
     }
 }

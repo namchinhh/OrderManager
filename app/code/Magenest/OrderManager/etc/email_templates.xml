@@ -6,6 +6,6 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
-    <!--<template id="ordermanager_email_accept_template" label="OrderManager Accept Email" file="custom_accept.html" type="html" module="Magenest_OrderManager" area="backend"/>-->
-    <!--<template id="ordermanager_email_delete_template" label="OrderManager Delete Email" file="custom_delete.html" type="html" module="Magenest_OrderManager" area="backend"/>-->
+    <template id="ordermanager_email_accept_template" label="OrderManager Accept Email" file="custom_accept.html" type="html" module="Magenest_OrderManager" area="frontend"/>
+    <template id="ordermanager_email_delete_template" label="OrderManager Delete Email" file="custom_delete.html" type="html" module="Magenest_OrderManager" area="frontend"/>
 </config>

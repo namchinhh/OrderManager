@@ -19,12 +19,15 @@ class Add extends AbstractProduct
      */
     public function execute()
     {
+
+
         $data = $this->getRequest()->getParams();
         $this->_coreRegistry->register('order_id',$data['order_id']);
 
         $this->_view->loadLayout();
         if ($block = $this->_view->getLayout()->getBlock('order.add.product')) {
             $block->setRefererUrl($this->_redirect->getRefererUrl());
+
         }
         $this->_view->renderLayout();
     }

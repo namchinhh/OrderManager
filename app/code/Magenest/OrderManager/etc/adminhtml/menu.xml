@@ -11,11 +11,20 @@
         />
         <add
                 id="Magenest_OrderManager::order"
-                title="Order manage "
+                title="Order Manage "
                 module="Magenest_OrderManager"
                 sortOrder="70"
                 parent="Magenest_OrderManager::ordermanager"
                 action="ordermanager/order/"
+                resource="Magenest_OrderManager::order"
+        />
+        <add
+                id="Magenest_OrderManager::config"
+                title="Manager Setting "
+                module="Magenest_OrderManager"
+                sortOrder="80"
+                parent="Magenest_OrderManager::ordermanager"
+                action="adminhtml/system_config/edit/section/ordermanager_labels"
                 resource="Magenest_OrderManager::order"
         />
     </menu>

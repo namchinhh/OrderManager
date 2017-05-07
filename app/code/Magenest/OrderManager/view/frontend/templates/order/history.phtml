@@ -54,7 +54,13 @@
                         <?php /* @escapeNotVerified */ echo $_order->getStatus() ?>
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Censorship')) ?>" class="col check">
-                        <?php /* @escapeNotVerified */ echo $_order->getStatusCheck() ?>
+                        <?php /* @escapeNotVerified */
+                        if($_order->getStatusCheck()=='accept'||$_order->getStatusCheck()=='delete'){
+                            echo "accept";
+                        }else{
+                            echo $_order->getStatusCheck();
+                        }
+                         ?>
                     </td>
                     <td data-th="<?php echo $block->escapeHtml(__('Create At')) ?>" class="col create">
                         <?php /* @escapeNotVerified */ echo $_order->getCreateAt() ?>
@@ -67,7 +73,7 @@
                             <span><?php /* @escapeNotVerified */ echo __('View') ?></span>
                         </a>
                         <?php endif;?>
-                        <?php if($_order->getStatusCheck() != 'accept' ): ?>
+                        <?php if($_order->getStatusCheck() != 'accept' && $_order->getStatusCheck()!='delete'): ?>
                         |
                         <a href="<?php /* @escapeNotVerified */ echo $block->getDeleteUrl($orderId) ?>" class="action delete">
                             <span><?php /* @escapeNotVerified */ echo __('Delete') ?></span>

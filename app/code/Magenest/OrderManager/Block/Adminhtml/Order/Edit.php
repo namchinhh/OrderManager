@@ -16,6 +16,11 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
     protected $_coreRegistry = null;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * @param \Magento\Backend\Block\Widget\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param array $data
@@ -23,9 +28,11 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
     public function __construct(
         \Magento\Backend\Block\Widget\Context $context,
         \Magento\Framework\Registry $registry,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         array $data = []
     ) {
         $this->_coreRegistry = $registry;
+        $this->scopeConfig = $scopeConfig;
         parent::__construct($context, $data);
     }
 
@@ -39,15 +46,24 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
         $this->_controller = 'adminhtml_order';
 
         parent::_construct();
-        $this->buttonList->add(
-            'accept',
-            [
-                'label' => __('Accept'),
-                'onclick' => 'setLocation(\'' . $this->_getSaveAndContinueUrl() . '\')',
-                'class' => 'action-default scalable primary'
-            ],
-            -100
-        );
+
+        $id = $this->getRequest()->getParam('id');
+        $order = \Magento\Framework\App\ObjectManager::getInstance()->create('Magenest\OrderManager\Model\OrderManage');
+        $status=$order->load($id)->getStatusCheck();
+        if($status=="accept"){
+            $this->buttonList->remove('accept');
+        }
+        else{
+            $this->buttonList->add(
+                'accept',
+                [
+                    'label' => __('Accept'),
+                    'onclick' => 'setLocation(\'' . $this->_getSaveAndContinueUrl() . '\')',
+                    'class' => 'action-default scalable primary'
+                ],
+                -100
+            );
+        }
         $this->buttonList->add(
             'print',
             [
@@ -57,7 +73,18 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
             ],
             0
         );
-        $this->buttonList->update('delete', 'label', __('Delete'));
+        /**
+         * check config
+         */
+        $model = \Magento\Framework\App\ObjectManager::getInstance()->create('Magento\Framework\App\Config\ScopeConfigInterface');
+        $allow =  $model->getValue('ordermanager_labels/ordermanager_editor/ordermanager_delete_core', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        if($allow == 0){
+            $this->buttonList->remove('delete');
+
+        }else{
+            $this->buttonList->update('delete', 'label', __('Delete'));
+
+        }
         $this->buttonList->remove('save');
         $this->buttonList->remove('reset');
     }

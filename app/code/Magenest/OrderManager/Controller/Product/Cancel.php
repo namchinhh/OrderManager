@@ -34,7 +34,7 @@ class Cancel extends AbstractProduct
                     $items->delete();
                     $totals++;
                 }
-                $this->messageManager->addSuccess(__('The Order has been deleted.'));
+                $this->messageManager->addSuccess(__('The Edit Order has been deleted.'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('sales/order/view', ['order_id'=>$orderId,'_current' => true]);

@@ -90,30 +90,29 @@ $currency = $block->getSymbolCurrency();
                     <?php echo (float)$collection->getTaxPercent(); ?>
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Select')) ?>" class="col select" >
-                    <input type="checkbox" name="select_product" id="select_product" style="width: 30px;height: 30px "/>
+                    <input type="checkbox" class="abc" name="select_product" id="select_product_<?php echo $collection->getId();?>" style="width: 30px;height: 30px "/>
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Quantity')) ?>" class="col quantity" name="quantity_item"
-                    id="quantity_item">
+                    id="quantity_item" >
                     <div class="control"  >
-                        <input type="number" name="quantity" id="quantity_check" class="input-number-quantity"
-                               style="width: 50px;" min="1" max="<?php echo  $block->getStockProduct()->getStockQty( $collection->getId()); ?>">
+                        <input type="number" name="quantity" id="quantity_check_<?php echo $collection->getId();?>" class="input-number-quantity"
+                               style="width: 50px;" min="1" max="<?php echo  $block->getStockProduct()->getStockQty( $collection->getId()); ?>" disabled>
                     </div>
-
                 </td>
             </tr>
-
         <?php } ?>
         </tbody>
     </table>
         <?php if ($block->getPagerHtml()): ?>
-            <div class="products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); // for display pager block which we create in block file.   ?></div>
+            <div class="products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); // for display pager block which we create in block file.
+                ?></div>
         <?php endif ?>
     <?php else: ?>
         <div class="message info empty"><span><?php echo __('empty'); ?></span></div>
     <?php endif ?>
     <button id="addproduct_content" style="float: left" class="action primary back"
             onclick="window.location.href='<?php echo $block->getBackUrl() ?>'">Back</button>
-    <button id="save_content" style="float: right" class="action primary data">Add Selected Product(s) to Order</button>
+    <button id="save_content" style="float: right" class="action primary data" >Add Selected Product(s) to Order</button>
 </div>
 
 <script type="text/javascript">
@@ -125,31 +124,58 @@ $currency = $block->getSymbolCurrency();
         'Magento_Ui/js/modal/modal'
     ], function($) {
         'use strict';
+        $(':checkbox').change(function(){
+            var id=$(this).parent().next().find("input.input-number-quantity").attr('id');
+            if ($(this).is(":checked")) {
+                $('#'+id).attr('disabled',false);
+                $('#'+id).val(0);
+            } else {
+                $('#'+id).attr({disabled:true,value:""});
+            }
+        });
         $("#save_content").click(function(){
-            var TableDatas;
-            var TableData = new Array();
-            $('#sampleTbl tr').has('input[type="checkbox"]:checked').each(function (row, tr) {
-                TableData[row] = {
-                    "productId": $(tr).find('td:eq(0)').text()
-                    , "orderId": $(tr).find('td:eq(1)').text()
-                    , "name": $(tr).find('td:eq(2)').text()
-                    , "sku": $(tr).find('td:eq(3)').text()
-                    , "price": $(tr).find('td:eq(4)').text()
-                    , "discount": $(tr).find('td:eq(5)').text()
-                    , "tax": $(tr).find('td:eq(6)').text()
-                    , "quantity": $(tr).find('td:eq(8) input').val()
-                }
-            });
-            TableDatas = JSON.stringify(TableData);
+                var TableDatas;
+                var TableData = new Array();
+                var valid=true;
+                var on=false;
+                $('#sampleTbl tr').has('input[type="checkbox"]:checked').each(function (row, tr) {
+                    on=true;
+                    if($(tr).find('td:eq(8) input').val()<=0){
+                        valid=false;
+                    }else
+                    {
+                        TableData[row] = {
+                            "productId": $(tr).find('td:eq(0)').text()
+                            , "orderId": $(tr).find('td:eq(1)').text()
+                            , "name": $(tr).find('td:eq(2)').text()
+                            , "sku": $(tr).find('td:eq(3)').text()
+                            , "price": $(tr).find('td:eq(4)').text()
+                            , "discount": $(tr).find('td:eq(5)').text()
+                            , "tax": $(tr).find('td:eq(6)').text()
+                            , "quantity": $(tr).find('td:eq(8) input').val()
+                        }
+                    }
+
+                });
+                if(valid&&on){
+                    TableDatas = JSON.stringify(TableData);
 //                $('#tbTableValues').val('JSON array: \n' + TableDatas.replace(/},/g, "},\n"));
-            $.ajax({
-                type: "POST",
-                url: '<?php echo $block->getNewAddProductUrl(); ?>',
-                data: "pTableData=" + TableDatas,
-                success: function(json){
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: '<?php echo $block->getNewAddProductUrl(); ?>',
+                        data: "pTableData=" + TableDatas,
+                        showLoader : true,
+                        success: function(){
 //                    if(!json.error) location.reload(true);
+                            alert("Items has been added.")
+                        }
+                    });
+                }else{
+                    alert("Please enter a number for quantity.");
                 }
-            });
+
         });
     });
 

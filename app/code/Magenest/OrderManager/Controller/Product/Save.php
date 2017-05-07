@@ -50,8 +50,7 @@ class Save extends AbstractProduct
                         'type'      => 'new',
                     ];
                     /** @var \Magenest\OrderManager\Model\OrderItem $model */
-                    $model = $collections->addFieldToFilter('order_id', trim($orderId))
-                                ->addFieldToFilter('product_id', trim($productId))->getFirstItem();
+                    $model = $collections->addFieldToFilter('order_id', trim($orderId))->addFieldToFilter('product_id', trim($productId))->getFirstItem();
                     $model->addData($dataInfo);
                     $model->save();
                     $totals++;

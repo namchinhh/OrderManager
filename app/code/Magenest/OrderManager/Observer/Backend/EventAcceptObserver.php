@@ -75,7 +75,8 @@ class EventAcceptObserver implements ObserverInterface
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magenest\OrderManager\Model\OrderManageFactory $manageFactory,
         Registry $registry
-    ) {
+    )
+    {
         $this->_logger = $loggerInterface;
         $this->_scopeConfig = $scopeConfig;
         $this->_coreRegistry = $registry;
@@ -90,37 +91,30 @@ class EventAcceptObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $id = $this->_coreRegistry->registry('id');
 
-        /** @var \Magenest\OrderManager\Model\OrderManageFactory $collection */
-        $collection = $this->_manageFactory->create()->load($id);
-        try {
-                $customer_name = $collection->getCustomerName();
-                $customer_email = $collection->getCustomerEmail();
-                $transport = $this->_transportBuilder->setTemplateIdentifier('ordermanager_email_accept_template')->setTemplateOptions(
-                    [
-                        'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
-                        'store' => $this->_storeManager->getStore()->getId(),
-                    ]
-                )->setTemplateVars(
-                    [
-                        'orderId' => $id,
-                        'accept_time'=> time(),
-                    ]
-                )->setFrom(
-                    [
-                        'email' => $this->_scopeConfig->getValue(self::XML_PATH_EMAIL_SENDER),
-                        'name' => $this->_scopeConfig->getValue(self::XML_PATH_NAME_SENDER),
-                    ]
-                )->addTo(
-                    $customer_email,
-                    $customer_name
-                )->getTransport();
+        $customer_name = $observer->getCustomerName();
+        $customer_email = $observer->getCustomerEmail();
+        $transport = $this->_transportBuilder->setTemplateIdentifier('ordermanager_email_accept_template'
+        )->setTemplateOptions(
+            [
+                'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
+                'store' => $this->_storeManager->getStore()->getId(),
+            ]
+        )->setTemplateVars(
+            [
+                'orderId' => $observer->getOrderId()
+            ]
+        )->setFrom(
+            [
+                'email' => $this->_scopeConfig->getValue(self::XML_PATH_EMAIL_SENDER),
+                'name' => $this->_scopeConfig->getValue(self::XML_PATH_NAME_SENDER),
+            ]
+        )->addTo(
+            $customer_email,
+            $customer_name
+        )->getTransport();
 
-                $transport->sendMessage();
-                $this->inlineTranslation->resume();
-        } catch (\Magento\Framework\Exception\LocalizedException $e) {
-                $this->_logger->critical($e);
-        }
+        $transport->sendMessage();
+        $this->inlineTranslation->resume();
     }
 }

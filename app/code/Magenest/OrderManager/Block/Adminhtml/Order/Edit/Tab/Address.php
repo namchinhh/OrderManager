@@ -134,6 +134,19 @@ class Address extends \Magento\Backend\Block\Widget\Form\Generic implements \Mag
     }
 
     /**
+     * check status of order
+     */
+    public function getAccept(){
+        $id = $this->getRequest()->getParam('id');
+        $order = \Magento\Framework\App\ObjectManager::getInstance()->create('Magenest\OrderManager\Model\OrderManage');
+        $status=$order->load($id)->getStatusCheck();
+        if( $status=="accept" ){
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
      * @return \Magento\Framework\Phrase
      */
     public function getTabLabel()

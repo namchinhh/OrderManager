@@ -47,14 +47,19 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
     protected $_connector;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * @var string
      */
     protected $_template='order/view/history.phtml';
 
     /**
-     * @var \Magenest\Salesforce\Model\FieldFactory
+     * @var \Magento\Store\Model\StoreManagerInterface
      */
-    protected $_fieldFactory;
+    protected $_storeManager;
 
     /**
      * Main constructor.
@@ -70,6 +75,7 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Data\FormFactory $formFactory,
         \Magenest\OrderManager\Model\OrderItemFactory     $itemFactory,
@@ -77,11 +83,14 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         \Magenest\OrderManager\Model\Connector            $connector,
         \Magenest\OrderManager\Helper\Total               $totalInfo,
         \Magento\Sales\Model\OrderFactory                 $ordercoreFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         array $data = []
     ) {
+        $this->_storeManager     = $storeManager;
         $this->_itemFactory      = $itemFactory;
         $this->_orderFactory     = $orderFactory;
         $this->_ordercoreFactory = $ordercoreFactory;
+        $this->scopeConfig       = $scopeConfig;
         $this->_connector        = $connector;
         $this->_totalInfo        = $totalInfo;
         parent::__construct($context, $registry, $formFactory, $data);
@@ -171,10 +180,46 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
     }
 
     /**
+     * check allow edit item by admin
+     */
+    public function getAllow(){
+        $model = \Magento\Framework\App\ObjectManager::getInstance()->create('Magento\Framework\App\Config\ScopeConfigInterface');
+        $allow =  $model->getValue('ordermanager_labels/ordermanager_editor/ordermanager_edit_item', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        if($allow == 0 || $this->getAccept()==1){
+            return "none";
+        }
+        return "block";
+    }
+
+    /**
+     * check status of order
+     */
+    public function getAccept(){
+        $id = $this->getRequest()->getParam('id');
+        $order = \Magento\Framework\App\ObjectManager::getInstance()->create('Magenest\OrderManager\Model\OrderManage');
+        $status=$order->load($id)->getStatusCheck();
+        if( $status=="accept" ){
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStoreId()
+    {
+        return $this->_storeManager->getStore()->getId();
+    }
+    /**
      * @return mixed
      */
     public function getEnableRemove()
     {
+        if($this->getAccept()==1){
+            return 0;
+        }
         $enable = $this->_connector->getRemoveItem();
 
         return $enable;

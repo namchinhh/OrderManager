@@ -19,31 +19,31 @@ $grandtotal = $_data['grandtotal'];
 <table style="width:30%" align="right">
 <tfoot>
 <tr class="discount" >
-    <th >Giảm giá</th>
+    <th >Discount</th>
     <td class="amount" data-th="discount">
         <span class="price"><?php echo  $symbol.$discount; ?></span>
     </td>
 </tr>
 <tr class="subtotal">
-    <th>Tổng giá sản phẩm</th>
+    <th>Subtotal</th>
     <td class="amount" data-th="Subtotal">
         <span class="price"><?php echo  $symbol.$subtotal; ?></span>
     </td>
 </tr>
 <tr class="shippinghandling">
-    <th>Phí vận chuyển</th>
+    <th>Shipping & Handling</th>
     <td class="amount" data-th="shippinghandling">
         <span class="price"><?php echo  $symbol.(float)$shipping; ?></span>
     </td>
 </tr>
 <tr class="tax">
-    <th>Thuế</th>
+    <th>Tax</th>
     <td class="amount" data-th="Tax">
         <span class="price"><?php echo  $symbol.$tax; ?></span>
     </td>
 </tr>
 <tr class="grandtotal">
-    <th>Tổng tiền hóa đơn</th>
+    <th>Grand Total</th>
     <td class="amount" data-th="Grand Total">
         <span class="price"><?php echo  $symbol.$grandtotal; ?></span>
     </td>

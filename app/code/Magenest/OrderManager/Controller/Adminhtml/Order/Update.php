@@ -79,7 +79,6 @@ class Update extends \Magento\Backend\App\Action
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {
                     return $resultRedirect->setPath('ordermanager/order/edit', ['id'=>$backId,'_current' => true]);
-
                 }
                 return $resultRedirect->setPath('ordermanager/order/edit',['id'=>$backId]);
             } catch (\LocalizedException $e) {

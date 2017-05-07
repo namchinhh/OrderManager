@@ -9,7 +9,7 @@ namespace Magenest\OrderManager\Controller\Adminhtml\Order;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\App\Response\Http\FileFactory;
-use Magenest\OrderManager\Helper\Pdf;
+use Magenest\OrderManager\Helper\Pdf as helperPdf;
 use Magenest\OrderManager\Controller\Adminhtml\Order as AbstractOrder;
 
 /**
@@ -32,22 +32,30 @@ class PrintOrder extends \Magento\Backend\App\Action
      * @var Pdforder
      */
     protected $helperPdf;
-
+    /**
+     * @var \Magento\Backend\Model\View\Result\ForwardFactory
+     */
+    protected $resultForwardFactory;
     /**
      * PdforderPrint constructor.
      * @param DateTime $dateTime
      * @param FileFactory $fileFactory
      * @param Pdforder $dataTemplate
      */
-    public function _construct(
+    public function __construct(
+        \Magento\Backend\App\Action\Context $context,
         DateTime $dateTime,
         FileFactory $fileFactory,
-        Pdf $helperPdf
+        helperPdf $helperPdf,
+        \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
 
     ) {
+
         $this->fileFactory = $fileFactory;
         $this->dateTime = $dateTime;
-        $this->helperPdf = $helperPdf;;
+        $this->helperPdf = $helperPdf;
+        $this->resultForwardFactory = $resultForwardFactory;
+        parent::__construct($context);
     }
 
     /**
@@ -59,15 +67,16 @@ class PrintOrder extends \Magento\Backend\App\Action
         $id = $this->getRequest()->getParam('id');
         $modelOrder = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage');
         $orderId = $modelOrder->load($id)->getOrderId();
+        \Magento\Framework\App\ObjectManager::getInstance()->create('Psr\Log\LoggerInterface')->debug(print_r($id, true));
+
         if ($orderId) {
             return $this->fileFactory->create(
-                sprintf('order%s.pdf', $this->dateTime->date('Y-m-d_H-i-s')),
-                $this->helperPdf->getPrintOrder($orderId),
+                sprintf('order%s.pdf', $this->dateTime->date('Y-m-d_H-i-s')), $this->helperPdf->getPrintOrder($orderId)->render(),
                 DirectoryList::VAR_DIR,
                 'application/pdf'
             );
+        }else {
+            return $this->resultForwardFactory->create()->forward('noroute');
         }
-
-        return true;
     }
 }

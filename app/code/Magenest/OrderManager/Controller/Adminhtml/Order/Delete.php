@@ -5,6 +5,7 @@
  * Date: 18/02/2016
  * Time: 09:50
  */
+
 namespace Magenest\OrderManager\Controller\Adminhtml\Order;
 
 use Magenest\OrderManager\Controller\Adminhtml\Order as AbstractOrder;
@@ -26,7 +27,8 @@ class Delete extends AbstractOrder
      */
     public function _construct(
         \Magenest\OrderManager\Model\OrderManageFactory $manageFactory
-    ) {
+    )
+    {
         $this->_manageFactory = $manageFactory;
     }
 
@@ -42,8 +44,8 @@ class Delete extends AbstractOrder
         $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage')->load($id);
 //        $manage = $this->_manageFactory->create()->load($id);
         $orderId = $model->getOrderId();
-        $this->_coreRegistry->register('id',$id);
-        $this->_eventManager->dispatch('ordermanager_send_email_after_click_button_delete');
+        $this->_coreRegistry->register('id', $id);
+
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         if ($orderId) {
@@ -51,11 +53,36 @@ class Delete extends AbstractOrder
              * delete order
              */
             $modelManage = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage');
-            $modelManage->load($orderId,'order_id');
-            $dataManage = [
-              'status_check'=>'no accept',
-            ];
-            $modelManage->addData($dataManage);
+            $modelManage->load($orderId, 'order_id');
+
+            /**
+             * clear order
+             */
+            if ($modelManage->getStatusCheck() == "accept") {
+                $dataManage = [
+                    'status_check' => 'delete'
+                ];
+                $modelManage->addData($dataManage);
+            }
+
+            else{
+                /**
+                 * send email
+                 */
+                $this->_eventManager->dispatch('ordermanager_send_email_after_click_button_delete',
+                    [
+                        'order_id' => $orderId,
+                        'customer_name' => $modelManage->getCustomerName(),
+                        'customer_email' => $modelManage->getCustomerEmail(),
+                    ]
+                );
+
+                $dataManage = [
+                    'status_check' => 'no accept',
+                ];
+                $modelManage->addData($dataManage);
+
+            }
 
             /**
              * delete item(s)
@@ -77,13 +104,13 @@ class Delete extends AbstractOrder
 
                 /** @var \Magenest\OrderManager\Model\OrderItem $items */
                 foreach ($modelItem as $items) {
-                    $items->setData($orderId,'order_id');
+                    $items->setData($orderId, 'order_id');
                     $items->delete();
                     $totals++;
                 }
-            /** @var \Magenest\OrderManager\Model\OrderAddress $addresss */
+                /** @var \Magenest\OrderManager\Model\OrderAddress $addresss */
                 foreach ($modelAddress as $addresss) {
-                    $addresss->setData($orderId,'order_id');
+                    $addresss->setData($orderId, 'order_id');
                     $addresss->delete();
                     $i++;
                 }

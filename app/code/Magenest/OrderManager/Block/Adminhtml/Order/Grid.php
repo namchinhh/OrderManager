@@ -24,6 +24,11 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
     protected $_status;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * Grid constructor.
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Backend\Helper\Data $backendHelper
@@ -34,9 +39,11 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Backend\Helper\Data $backendHelper,
         \Magenest\OrderManager\Model\ResourceModel\OrderManage\Collection $orderCollection,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         array $data = []
     ) {
         $this->_orderCollection = $orderCollection;
+        $this->scopeConfig = $scopeConfig;
         parent::__construct($context, $backendHelper, $data);
         $this->setEmptyText(__('No Order change'));
     }
@@ -85,7 +92,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
         $this->addColumn(
             'status_check',
             [
-                'header' =>__('Sensorship'),
+                'header' =>__('Censorship'),
                 'index' => 'status_check',
             ]
         );
@@ -110,6 +117,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
                 'index'   =>'customer_email',
             ]
         );
+
         $this->addColumn(
             'edit',
             [
@@ -142,6 +150,14 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     protected function _prepareMassaction()
     {
+        /**
+         * check config
+         */
+        $model = \Magento\Framework\App\ObjectManager::getInstance()->create('Magento\Framework\App\Config\ScopeConfigInterface');
+        $allow =  $model->getValue('ordermanager_labels/ordermanager_editor/ordermanager_delete_core', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        if($allow == 0){
+            return ;
+        }
         $this->setMassactionIdField('id');
         $this->getMassactionBlock()->setTemplate('Magento_Backend::widget/grid/massaction_extended.phtml');
         $this->getMassactionBlock()->setFormFieldName('order');

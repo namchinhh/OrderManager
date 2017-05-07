@@ -34,11 +34,31 @@ class MassDelete extends AbstractOrder
                 /* Delete Order Edit */
 
                 foreach ($data as $dataInfo) {
+
                     $id            = $dataInfo;
                     $order        = $manageOrder->load($id);
-                    $dataManage   =[
-                        'status_check'=>'no accept',
-                    ];
+                    /**
+                     * clear order
+                     */
+                    if ($order->getStatusCheck() == "accept") {
+                        $dataManage = [
+                            'status_check' => 'delete'
+                        ];
+                        $order->addData($dataManage);
+                    }
+                    else{
+                        $dataManage   =[
+                            'status_check'=>'no accept',
+                        ];
+                        $this->_eventManager->dispatch('ordermanager_send_email_after_click_button_delete',
+                            [
+                                'order_id'=>$id,
+                                'customer_name'=>$order->getCustomerName(),
+                                'customer_email'=>$order->getCustomerEmail(),
+                            ]
+                        );
+                    }
+
                     $i++;
                     $orderId = $order->getOrderId();
                     if ($orderId) {

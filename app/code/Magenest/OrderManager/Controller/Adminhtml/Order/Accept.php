@@ -76,7 +76,7 @@ class Accept extends  \Magento\Backend\App\Action
         $this->_itemFactory    = $itemFactory;
         $this->_addressFactory = $addressFactory;
         $this->_regionFactory  = $regionFactory;
-        $this->_coreRegistry       = $registry;
+        $this->_coreRegistry   = $registry;
         $this->orderManagement = $orderManagement;
         parent::__construct($context);
 
@@ -89,7 +89,8 @@ class Accept extends  \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $id = $this->getRequest()->getParam('id');
+        $id = $this->getRequest()->getParams();
+
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $modelManageOrder = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage');
@@ -97,18 +98,26 @@ class Accept extends  \Magento\Backend\App\Action
         $modelItem        = $this->_objectManager->create('Magento\Sales\Model\Order\Item');
         $modelAddress     = $this->_objectManager->create('Magento\Sales\Model\Order\Address');
 
-        $orderId = $modelManageOrder->load($id)->getOrderId();
-        $modelOrderInt = $this->orderManagement->cancel(27);
-        $items            = $this->_itemFactory->create()->getCollection()
-                            ->addFieldToFilter('order_id',$orderId);
-        $address          = $this->_addressFactory->create()->getCollection()
-                            ->addFieldToFilter('order_id',$orderId);
+        $orderId = $modelManageOrder->load($id['id'])->getOrderId();
 
+
+//        $modelOrderInt = $this->orderManagement->cancel(27);
+        $items = $this->_itemFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId);
+        $address = $this->_addressFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId);
+
+        $modelManageOrder->load($orderId,'order_id');
         $this->_coreRegistry->register('id',$id);
-        $this->_eventManager->dispatch('ordermanager_send_email_after_click_button_accept');
+
+        $this->_eventManager->dispatch(
+            'ordermanager_send_email_after_click_button_accept',[
+                    'order_id'=>$orderId,
+                    'customer_name'=>$modelManageOrder->getCustomerName(),
+                    'customer_email'=>$modelManageOrder->getCustomerEmail(),
+                ]
+        );
         $i = 0;
             try {
-                $modelManageOrder->load($orderId,'order_id');
+//                $modelManageOrder->load($orderId,'order_id');
                 $modelManageOrder->setData('status_check','accept');
                 $modelManageOrder->save();
                  /* save item */
@@ -125,12 +134,12 @@ class Accept extends  \Magento\Backend\App\Action
                             'discount_percent'       => $item['discount'],
                             'discount_amount'        => $item['discount'] * $item['quantity'] * $item['price'] / 100,
                             'base_discount_amount'   => $item['discount'] * $item['quantity'] * $item['price'] / 100,
-                            'discount_invoiced'      => $item['discount'] * $item['quantity'] * $item['price'] / 100,
+//                            'discount_invoiced'      => $item['discount'] * $item['quantity'] * $item['price'] / 100,
                             'base_discount_invoiced' => $item['discount'] * $item['quantity'] * $item['price'] / 100,
                             'qty_ordered'            => $item['quantity'],
                             'row_total'              => $item['quantity'] * $item['price'],
                             'base_row_total'         => $item['quantity'] * $item['price'],
-                            'row_invoiced'           => $item['quantity'] * $item['price'],
+//                            'row_invoiced'           => $item['quantity'] * $item['price'],
                             'base_row_invoiced'      => $item['quantity'] * $item['price'],
                             'tax_percent'            => $item['tax'],
                             'tax_amount'             => $item['tax'] * $item['quantity'] * $item['price'] / 100,
@@ -190,10 +199,12 @@ class Accept extends  \Magento\Backend\App\Action
                         $totalTax += $tax;
                         $subtotal += $rowTotal;
                         $grandtotal = $subtotal + $totalTax - $totalDiscount + $costShip;
+
                     }
 
 
                     $dataOrder = [
+
                         'base_grand_total'      => $grandtotal,
                         'grand_total'           => $grandtotal,
                         'base_total_invoiced'   => $grandtotal,
@@ -202,7 +213,7 @@ class Accept extends  \Magento\Backend\App\Action
                         'total_due'             => $grandtotal,
                         'subtotal'              => $subtotal,
                         'base_subtotal'         => $subtotal,
-                        'subtotal_invoiced'     => $subtotal,
+//                        'subtotal_invoiced'     => $subtotal,
                         'base_subtotal_invoice' => $subtotal,
                         'tax_amount'            => $totalTax,
                         'tax_invoiced'          => $totalTax,
@@ -210,12 +221,12 @@ class Accept extends  \Magento\Backend\App\Action
                         'base_tax_invoiced'     => $totalTax,
                         'discount_amount'       => '-'.$totalDiscount,
                         'base_discount_amount'  => '-'.$totalDiscount,
-                        'discount_invoiced'     => '-'.$totalDiscount,
+//                        'discount_invoiced'     => '-'.$totalDiscount,
                         'base_discount_invoiced'=> '-'.$totalDiscount,
                         'total_qty_ordered'     => $totalQuantity ,
                         'shipping_amount'       => $costShip,
                         'base_shipping_amount'  => $costShip,
-                        'base_shipping_invoiced'=> $costShip,
+//                        'base_shipping_invoiced'=> $costShip,
 
                     ];
                     $modelOrder->addData($dataOrder);

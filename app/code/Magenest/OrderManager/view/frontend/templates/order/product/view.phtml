@@ -56,7 +56,7 @@ $imageRender = $block->getImageRender();
             <tbody>
             <?php $i = 0 ?>
 
-            <?php foreach ($_items->getAllItems()as $_item ) { ?>
+            <?php foreach ($_items->getAllItems()as $_item ): ?>
                 <?php $productId = $_item->getProductId();
                 ?>
                 <tr>
@@ -95,12 +95,15 @@ $imageRender = $block->getImageRender();
                         <?php echo $symbol.(float)$_item->getRowTotal(); ?>
                     </td>
                 </tr>
-            <?php } ?>
+            <?php endforeach; ?>
             </tbody>
         </table>
 
     </form>
-    <?php if(!empty($_dataOrder->getData())): ?>
+
+    <?php
+    if(!empty($_dataOrder->getData())):
+        ?>
     <?php /** Table new product */ ?>
     <div id="new_product">
     <?php echo $block->getProductNew();?>

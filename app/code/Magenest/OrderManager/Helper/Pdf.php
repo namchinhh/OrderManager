@@ -47,29 +47,26 @@ class Pdf extends AbstractHelper
      */
     public function getPrintOrder($orderId)
     {
-        if ($orderId) {
-            $pdf   = new \Zend_Pdf();
-            $page  = new \Zend_Pdf_Page('595:842');
-            $model = $this->orderFactory->create()->load($orderId);
-            $fontEdit = \Zend_Pdf_Font::fontWithName(\Zend_Pdf_Font::FONT_HELVETICA_BOLD);
-            $number = count($model->getAllItems());
+        $pdf   = new \Zend_Pdf();
+        $page  = new \Zend_Pdf_Page('595:842');
+        $model = $this->orderFactory->create()->load($orderId);
+        $fontEdit = \Zend_Pdf_Font::fontWithName(\Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+        $number = count($model->getAllItems());
 
-            if ($number > 0) {
-                $page = $this->printPdf($page, $model);
-                $y    = 762;
-                $page->setFont($fontEdit, 14)
-                    ->drawText(__(' ORDER '), 20, 818, 'UTF-8');
-                $page->setFont($fontEdit, 13);
-                $page->drawText(__('Order Number : #').$model->getIncrementId(), 50, $y, 'UTF-8');
-                $page->setFont($fontEdit, 11);
-                $page->drawText(__('Date : ').$model->getUpdatedAt(), 50, ($y - 15), 'UTF-8');
-                $page->drawText(__('Status : ').$model->getStatus(), 50, ($y - 30), 'UTF-8');
-            }
-            $pdf->pages[] = $page;
-            return $pdf->render();
-        } else {
-            return false;
+        if ($number > 0) {
+            $page = $this->printPdf($page, $model);
+            $y    = 762;
+            $page->setFont($fontEdit, 14)
+                ->drawText(__(' ORDER '), 20, 818, 'UTF-8');
+            $page->setFont($fontEdit, 13);
+            $page->drawText(__('Order Number : #').$model->getIncrementId(), 50, $y, 'UTF-8');
+            $page->setFont($fontEdit, 11);
+            $page->drawText(__('Date : ').$model->getUpdatedAt(), 50, ($y - 15), 'UTF-8');
+            $page->drawText(__('Status : ').$model->getStatus(), 50, ($y - 30), 'UTF-8');
         }
+        $pdf->pages[] = $page;
+
+        return $pdf;
     }
 
     /**
@@ -81,8 +78,8 @@ class Pdf extends AbstractHelper
     {
         $fontRegular = \Zend_Pdf_Font::fontWithName(\Zend_Pdf_Font::FONT_HELVETICA);
         $fontEdit = \Zend_Pdf_Font::fontWithName(\Zend_Pdf_Font::FONT_HELVETICA_BOLD);
-         $imageBackground = \Zend_Pdf_Image::imageWithPath("app/code/Magenest/OrderManager/view/frontend/web/images/Yellow.jpg");
-         $page->drawImage($imageBackground, 0, 0, 595, 842);
+        $imageBackground = \Zend_Pdf_Image::imageWithPath("app/code/Magenest/OrderManager/view/frontend/web/images/Yellow.jpg");
+        $page->drawImage($imageBackground, 0, 0, 595, 842);
 
         /** @var \Magento\Sales\Model\OrderFactory  $model*/
 
@@ -92,11 +89,11 @@ class Pdf extends AbstractHelper
             $shipping = $model->getShippingAddress()->getData();
             $page = $this->printAddress($page, $shipping, 'ship');
         }
-         $payment       = $model->getPayment()->getAdditionalInformation();
-         $paymentMethod = $payment['method_title'];
-         $symbol = $model->getOrderCurrency()->getCurrencySymbol();
-         $shippingMethod = $model->getShippingDescription();
-         $items = $model->getAllItems();
+        $payment       = $model->getPayment()->getAdditionalInformation();
+        $paymentMethod = $payment['method_title'];
+        $symbol = $model->getOrderCurrency()->getCurrencySymbol();
+        $shippingMethod = $model->getShippingDescription();
+        $items = $model->getAllItems();
 
         $page->drawText($paymentMethod, 50, 475, 'UTF-8');
         $page->drawText($shippingMethod, 318, 475, 'UTF-8');

@@ -73,7 +73,7 @@ $symbol = $block->getSymbolCurrency();
                             <?php $max = $_data->getQuantity(); ?>
                         <?php endif;?>
                         <input type="number" name="quantity-<?php echo $productId  ?>" id="quantity" class="input-number-quantity"
-                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>" min="<?php echo $_data->getQuantity(); ?>"
+                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>" min=1
                         max="<?php echo $block->getStockProduct()->getStockQty($productId); ?>">
                     </div>
                 </td>

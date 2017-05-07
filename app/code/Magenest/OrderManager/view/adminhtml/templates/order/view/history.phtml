@@ -13,17 +13,18 @@ $_dataOrder = $block->getItems();
 $order_id   = $block->getOrderId();
 $_total     = $block->getTotal();
 $symbol     = $_total['symbol'];
+$allow      = $block->getAllow();
 ?>
 <div class="addproduct">
-    <input type="button" id="addproduct_content" style="float: right" class="action-secondary action-add"
-            onclick="window.location.href='<?php echo $block->getAddProductUrl() ?>'" value="Add Products"/>
+    <input type="button" id="addproduct_content" style="float: right; display: <?php echo $allow; ?>;" class="action-secondary action-add"
+            onclick="window.location.href='<?php echo $block->getAddProductUrl() ?>'" value="Add Products" />
 </div>
 
 <form class="form-product-edit"  method="post" id="form-validate" enctype="multipart/form-data"
       action="<?php echo $block->getUpdateProductUrl();?>"
       data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
       <?php if(!empty($_dataOrder->getData())): ?>
-    <div class="actions-toolbar">
+    <div class="actions-toolbar" style="display: <?php echo $allow; ?>;">
         <div class="primary">
             <button type="submit" class="action update primary" data-action="update-Data"
                     title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>">
@@ -34,6 +35,9 @@ $symbol     = $_total['symbol'];
     <?php endif; ?>
     <div>
         <input name="form_key" value="<?php echo $block->getFormKey() ?>" type="hidden">
+    </div>
+    <div>
+        <input name="store_id" value="<?php echo $block->getStoreId() ?>" type="hidden">
     </div>
     <table class="data-table" data-role="flex-table">
         <thead>
@@ -69,7 +73,12 @@ $symbol     = $_total['symbol'];
                 <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
                     <div class="control">
                         <input type="text" name="quantity-<?php echo $productId  ?>" id="quantity" class="input-number-quantity"
-                               style="width: 50px;" value="<?php echo (float)$_data->getQuantity(); ?>">
+                               style="width: 50px;" value="<?php echo (float)$_data->getQuantity(); ?>"
+                            <?php
+                            if($block->getAccept() == 1)
+                                echo 'disabled';
+                            ?>
+                        >
                     </div>
                 </td>
 
@@ -80,7 +89,12 @@ $symbol     = $_total['symbol'];
                 <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
                     <div class="control">
                         <input type="text" name="discount-<?php echo $productId  ?>" id="discount" class="input-percent-discount"
-                               style="width: 50px;" value="<?php echo $_data->getDiscount(); ?>">%
+                               style="width: 50px;" value="<?php echo $_data->getDiscount(); ?>"
+                            <?php
+                            if($block->getAccept() == 1)
+                                echo 'disabled';
+                            ?>
+                        > %
                     </div>
                 <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col-tax">
                     <?php echo (float)$_data->getTax().'%'; ?>
